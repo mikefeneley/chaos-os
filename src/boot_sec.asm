@@ -1,22 +1,115 @@
+
+
+
 ;
-; A simple boot sector program that demonstrates segment offsetting
+; A boot sector that prints a string using our function.
+;
+[org 0x7c00] ; Tell the assembler where this code will be loaded
+
+mov ah, 0x0e
+
+mov bx, HELLO_MSG ; Use BX as a parameter to our function , so
+
+mov al, "H"
+
+mov al, bl
+
+int 0x10
+
+
+
+;call print_string ; we can specify the address of a string.
+
+;mov bx, GOODBYE_MSG
+;call print_string
+;jmp $ ; Hang
+
+%include "print_string.asm"
+
+HELLO_MSG:
+    db "Hello World0", 
+
+GOODBYE_MSG:
+    db "Goodbye World0", 
+
+%if 0
+
+;
+; A simple boot sector program that demonstrates the stack.
+;
+mov ah, 0x0e ; int 10/ ah = 0eh -> scrolling teletype BIOS routine
+mov bp, 0x8000 ; Set the base of the stack a little above where BIOS
+mov sp, bp ; loads our boot sector - so it won ’t overwrite us.
+
+push 'A' ; Push some characters on the stack for later
+push 'B' ; retreival. Note , these are pushed on as
+push 'C' ; 16 - bit values , so the most significant byte will be added by our assembler as 0 x00.
+pop bx ; Note , we can only pop 16 - bits , so pop to bx
+mov al , bl ; then copy bl ( i.e. 8- bit char ) to al
+int 0x10 ; print (al)
+pop bx ; Pop the next value
+mov al , bl
+int 0x10 ; print (al)
+mov al , [0x7ffe ] ; To prove our stack grows downwards from bp ,
+; fetch the char at 0 x8000 - 0x2 ( i.e. 16 - bits )
+int 0x10 ; print (al)
+jmp $ ; Jump forever.
+; Padding and magic BIOS number.
+
+
+
+
+[org 0x7c00]
+;
+; A simple boot sector program that demonstrates addressing.
 ;
 mov ah , 0x0e ; int 10/ ah = 0eh -> scrolling teletype BIOS routine
+
+; First attempt
+mov al, the_secret
+int 0x10 ; Does this print an X?
+
+; Second attempt
 mov al , [ the_secret ]
 int 0x10 ; Does this print an X?
-mov bx , 0x7c0 ; Can ’t set ds directly , so set bx
-mov ds , bx ; then copy bx to ds.
-mov al , [ the_secret ]
+
+; Third attempt
+mov bx , the_secret
+add bx , 0x7c00
+mov al , [bx]
 int 0x10 ; Does this print an X?
-mov al , [es: the_secret ] ; Tell the CPU to use the es ( not ds) segment.
-int 0x10 ; Does this print an X?
-mov bx , 0x7c0
-mov es , bx
-mov al , [es: the_secret ]
+
+; Fourth attempt
+mov al , [0x7c1d]
 int 0x10 ; Does this print an X?
 jmp $ ; Jump forever.
+
+
 the_secret :
-db "X "
-; Padding and magic BIOS number.
-times 510 -( $ - $$ ) db 0
-dw 0xaa55
+	db "X"
+my_string :
+	db "Booting OS0", 
+
+
+
+mov ah, 0x0e
+mov al, "H"
+int 0x10
+mov al, "e"
+int 0x10
+mov al, "l"
+int 0x10
+mov al, "l"
+int 0x10
+mov al, "o"
+int 0x10
+
+jmp $
+
+%endif;0
+
+
+
+times 510-($-$$) db 0 
+dw 0xaa55 
+
