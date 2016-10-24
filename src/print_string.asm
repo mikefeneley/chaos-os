@@ -1,10 +1,10 @@
 print_string:
-;    mov ah, 0x0e
-    
-;    mov al, bl
-    
-
-    
-;    int 0x10
-        
-
+    push bx
+    mov ah, 0x0e
+loop:
+    mov al, [bx]
+    int 0x10
+    inc bx    
+    cmp al, 0    
+    jne loop
+    ret
