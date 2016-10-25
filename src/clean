@@ -1,2 +1,3 @@
+rm *.o
+rm *.bin
 rm boot_sec
-rm boot_sec[1-4]

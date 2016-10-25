@@ -1,4 +1,11 @@
 
-nasm boot_sec.asm
 
-qemu-system-i386 boot_sec
+gcc -ffreestanding -c kernel.c -o kernel.o
+ld -o kernel.bin -Ttext 0x1000 kernel.o --oformat binary
+
+nasm boot_sec.asm -o boot_sec.bin
+
+cat boot_sec.bin kernel.bin > os-image
+
+
+qemu-system-i386 os-image 
