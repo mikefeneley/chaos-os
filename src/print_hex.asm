@@ -1,11 +1,8 @@
-
 print_hex:
     push ax
     push bx
     push dx
     mov ah, 0x0e   
-    mov bl, 0x0
-    mov [HEX_OUT + 6], bl
     jmp FIRST
 
 FIRST:
@@ -71,9 +68,20 @@ LETTER4:
     jmp END 
 
 END:
+    mov dl, 'x'
+    mov [HEX_OUT + 1], dl    
+    mov dl, '0'
+    mov [HEX_OUT], dl
+
     mov bx, HEX_OUT
+
     call print_string
+
+    pop dx
+    pop bx
+    pop ax
     ret
+
 
 HEX_OUT: 
     db '0x0000', 0
