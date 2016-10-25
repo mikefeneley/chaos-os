@@ -2,57 +2,37 @@
 
 [org 0x7c00] 
 
-;call print_reg
+    mov bp, 0x9000
 
-mov [BOOT_DRIVE], dl ; BIOS stores our boot drive in DL , so it ’s; best to remember this for later.
-
-mov bp , 0x8000 ; Here we set our stack safely out of the
-mov sp , bp     ; way , at 0 x8000
-
-mov bx , 0x9000 ; Load 5 sectors to 0 x0000 (ES ):0 x9000 (BX)
-mov dh , 5      ; from the boot disk.
-
-mov dl , [BOOT_DRIVE]
-call disk_load
-
-mov dx , [0x9000] ; Print out the first loaded word , which
-call print_hex
-
-mov al, 'G'
-int 0x10
-int 0x10
-int 0x10
-int 0x10
+    mov sp, bp
+   
+    mov bx, MSG_REAL_MODE
+    call print_string
+   
+    call switch_to_pm ; Note that we never return from here.
+    jmp $
 
 
-mov dx , [0x9000 + 512] ; Also , print the first word from the
-call print_hex
-
-
-jmp $
 
 %include "test.asm"
-%include "print_reg.asm"
+;%include "print_reg.asm"
 %include "print_hex.asm"
 %include "print_string.asm" ; Re - use our print_string function
 %include "disk_load.asm"
+%include "print.asm"
+%include "gdt.asm"
+%include "switch.asm"
+
+BEGIN_PM:
+    mov ebx, MSG_PROT_MODE
+    call print_string_pm ; Use our 32 - bit print routine.
+    jmp $ ; Hang.
 
 
-; Include our new disk_load function
-; Global variables
-BOOT_DRIVE:
-    db 0
+MSG_REAL_MODE db "Started in 16 bit real mode", 0
+MSG_PROT_MODE: 
+    db "Switched to 32 bit mode", 0
 
-HELLO_MSG:
-    db "Hello World", 0 
-
-GOODBYE_MSG:
-    db "Goodbye World", 0
-
-
-
-times 510 -( $ - $$ ) db 0
+; Bootsector padding
+times 510-($-$$) db 0
 dw 0xaa55
-
-times 256 dw 0xdada
-times 256 dw 0xface
