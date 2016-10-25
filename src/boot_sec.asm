@@ -2,26 +2,7 @@
 
 [org 0x7c00] 
 
-mov ax, 0x7863
-mov bx, 0x8381
-mov cx, 0x8362
-mov dx, 0xabdc
-
-call print_reg
-
-jmp $
-
-mov [HOLD1], dx
-mov dx, ax
-call print_hex
-mov dx, bx 
-call print_hex 
-mov dx, cx
-call print_hex
-mov dx, [HOLD1]
-
-
-jmp $
+;call print_reg
 
 mov [BOOT_DRIVE], dl ; BIOS stores our boot drive in DL , so it ’s; best to remember this for later.
 
@@ -44,12 +25,8 @@ int 0x10
 int 0x10
 
 
-
 mov dx , [0x9000 + 512] ; Also , print the first word from the
 call print_hex
-
-mov al, 'M'
-int 0x10
 
 
 jmp $
