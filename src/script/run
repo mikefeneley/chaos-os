@@ -1,0 +1,12 @@
+gcc -ffreestanding -c kernel.c -elf -o kernel.o -m32 
+#ld -o kernel.bin -Ttext 0x1000 kernel.o --oformat binary -entry main
+
+nasm kernel_entry.asm -f elf -o kernel_entry.o
+nasm boot_sec.asm -o boot_sec.bin
+
+ld -o kernel.bin -m elf_i386 -Ttext 0x1000 kernel_entry.o kernel.o --oformat binary
+
+cat boot_sec.bin kernel.bin > os-image
+
+
+qemu-system-i386 os-image 
