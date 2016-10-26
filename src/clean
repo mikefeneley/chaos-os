@@ -1,4 +1,0 @@
-rm *.o
-rm *.bin
-rm boot_sec
-rm os-image
