@@ -30,5 +30,5 @@ kernel.bin: kernel/kernel_entry.o ${OBJ}
 	nasm $< -I "./boot/" -o $@ 
 
 clean:
-	rm -fr *. bin *. dis *. o os-image
+	rm -fr *.bin *.dis *.o os-image
 	rm -fr kernel/*.o boot/*.bin drivers/*.o
